@@ -5,8 +5,8 @@
 import requests # for building robust and reliable HTTP–speaking applications
 import ST7735 # allows simple drawing wo installing kernel module
 import time
-from bme280 import BME280
-from pms5003 import PMS5003, ReadTimeoutError, ChecksumMismatchError
+from bme280 import BME280 # imports the Bosch BME280 digital sensor module for temperature, humidity and pressure sensing
+from pms5003 import PMS5003, ReadTimeoutError, ChecksumMismatchError # imports PMS5003 sensor module
 from subprocess import PIPE, Popen, check_output
 from PIL import Image, ImageDraw, ImageFont
 from fonts.ttf import RobotoMedium as UserFont
