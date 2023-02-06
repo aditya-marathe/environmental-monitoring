@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import requests
-import ST7735
+import ST7735 # allows simple drawing wo installing kernel module
 import time
 from bme280 import BME280
 from pms5003 import PMS5003, ReadTimeoutError, ChecksumMismatchError
