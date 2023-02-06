@@ -22,6 +22,8 @@ logging.basicConfig(
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
 
+# Creating a message to be displayed
+
 logging.info("""luftdaten.py - Reads temperature, pressure, humidity,
 #PM2.5, and PM10 from Enviro plus and sends data to Luftdaten,
 #the citizen science air quality project.
@@ -38,10 +40,10 @@ logging.info("""luftdaten.py - Reads temperature, pressure, humidity,
 
 bus = SMBus(1)
 
-# Create BME280 instance
+# Create BME280 instance (instances are for readings that change every time)
 bme280 = BME280(i2c_dev=bus)
 
-# Create LCD instance
+# Create LCD instance (creating a real-time display output for the data)
 disp = ST7735.ST7735(
     port=0,
     cs=1,
