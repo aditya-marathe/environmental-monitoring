@@ -213,7 +213,7 @@ while True:
     try:
         values = read_values()
         time_since_update = time.time() - update_time
-        if time_since_update > 145:
+        if time_since_update > 300: # updates every 5 minutes ie. 300 seconds (this value was previously 145 seconds)
             logging.info(values)
             update_time = time.time()
             if send_to_luftdaten(values, id):
