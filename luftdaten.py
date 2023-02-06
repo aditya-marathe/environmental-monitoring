@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import requests
+import requests # for building robust and reliable HTTP–speaking applications
 import ST7735 # allows simple drawing wo installing kernel module
 import time
 from bme280 import BME280
