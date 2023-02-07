@@ -232,6 +232,3 @@ def main():
 if __name__ == "__main__":
     if not (datetime.now().minute % 5):
         main()
-
-def hourly_mean():
-    mean = np.sum(
