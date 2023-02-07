@@ -209,7 +209,7 @@ while True:
     try:
         values = read_values()
         time_since_update = time.time() - update_time
-        if time_since_update > 145:
+        if time_since_update > 30:
             logging.info(values)
             update_time = time.time()
             if send_to_luftdaten(values, id):
