@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# code found by Ed Rutherford
+# Code from Ed Rutherford on GitLab
 
 import requests # for building robust and reliable HTTP–speaking applications
 import ST7735 # allows simple drawing wo installing kernel module
