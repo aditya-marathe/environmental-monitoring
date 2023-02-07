@@ -5,11 +5,14 @@
 import requests # for building robust and reliable HTTP–speaking applications
 import ST7735 # allows simple drawing wo installing kernel module
 import time
+import pytz # imports timezones
 from bme280 import BME280 # imports the Bosch BME280 digital sensor module for temperature, humidity and pressure sensing
 from pms5003 import PMS5003, ReadTimeoutError, ChecksumMismatchError # imports PMS5003 sensor module
 from subprocess import PIPE, Popen, check_output # PIPE = Python library that passes results of one method to another method, Popen = removes element of specified position
 from PIL import Image, ImageDraw, ImageFont # importing graphics
 from fonts.ttf import RobotoMedium as UserFont # importing font
+from datetime import datetime # import
+datetime.now()
 
 try:
     from smbus2 import SMBus
@@ -208,18 +211,27 @@ logging.info("Wi-Fi: {}\n".format("connected" if check_wifi() else "disconnected
 time_since_update = 0
 update_time = time.time()
 
-# Main loop to read data, display, and send to Luftdaten
-while True:
-    try:
-        values = read_values()
-        time_since_update = time.time() - update_time
-        if time_since_update > 300: # updates every 5 minutes ie. 300 seconds (this value was previously 145 seconds)
-            logging.info(values)
-            update_time = time.time()
-            if send_to_luftdaten(values, id):
-                logging.info("Luftdaten Response: OK")
-            else:
-                logging.warning("Luftdaten Response: Failed")
-        display_status()
-    except Exception as e:
-        logging.warning('Main Loop Exception: {}'.format(e))
+def main():
+    # Main loop to read data, display, and send to Luftdaten
+    while True:
+        try:
+            values = read_values()
+            time_since_update = time.time() - update_time
+            if time_since_update > 300: # updates every 5 minutes ie. 300 seconds (this value was previously 145 seconds)
+                logging.info(values)
+                update_time = time.time()
+                if send_to_luftdaten(values, id):
+                    logging.info("Luftdaten Response: OK")
+                else:
+                    logging.warning("Luftdaten Response: Failed")
+            display_status()
+        except Exception as e:
+            logging.warning('Main Loop Exception: {}'.format(e))
+
+# Running the above function if time in mins is divisible by 5
+if __name__ == "__main__":
+    if not (datetime.now().minute % 5):
+        main()
+
+def hourly_mean():
+    mean = np.sum(
