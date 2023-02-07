@@ -208,10 +208,10 @@ font = ImageFont.truetype(UserFont, font_size)
 logging.info("Raspberry Pi serial: {}".format(get_serial_number()))
 logging.info("Wi-Fi: {}\n".format("connected" if check_wifi() else "disconnected"))
 
-time_since_update = 0
-update_time = time.time()
 
 def main():
+    time_since_update = 0
+    update_time = time.time()
     # Main loop to read data, display, and send to Luftdaten
     while True:
         try:
