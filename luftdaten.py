@@ -230,5 +230,6 @@ def main():
 
 # Running the above function if time in mins is divisible by 5
 if __name__ == "__main__":
-    if not (datetime.now().minute % 5):
-        main()
+    while True:
+        if not (datetime.now().minute % 5):
+            main()
