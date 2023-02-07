@@ -222,10 +222,11 @@ def main():
                 update_time = time.time()
                 if send_to_luftdaten(values, id):
                     logging.info("Luftdaten Response: OK")
+                    print(values)
                 else:
                     logging.warning("Luftdaten Response: Failed")
             display_status()
-        except Exception as e:
+         except Exception as e:
             logging.warning('Main Loop Exception: {}'.format(e))
 
 # Running the above function if time in mins is divisible by 5
