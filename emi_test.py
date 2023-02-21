@@ -5,6 +5,7 @@ import requests
 import logging
 import datetime
 import pickle
+import sqlite3
 
 from subprocess import PIPE, Popen, check_output
 
@@ -77,7 +78,7 @@ def read_values():
     current_time = str(datetime.datetime.now())
 
     values["temperature"] = "{:.2f}".format(comp_temp)
-    values["pressure"] = "{:.2f}".format(bme280.get_pressure() * 100)
+    values["pressure"] = "{:.2f}".format(bme280.get_pressure()) #* 100)
     values["humidity"] = "{:.2f}".format(bme280.get_humidity())
 
     # PM2.5, PM10
@@ -230,8 +231,38 @@ id = "raspi-" + get_serial_number()
 logging.info("Raspberry Pi serial: {}".format(get_serial_number()))
 logging.info("Wi-Fi: {}\n".format("connected" if check_wifi() else "disconnected"))
 
+# Create database =======================================================================
+
+conn = sqlite3.connect("./session.db")
+cursor = conn.cursor()
+
+conn.execute("""CREATE TABLE data (
+                time TEXT,
+                temperature DOUBLE(10),
+                humidity DOUBLE(10),
+                pressure DOUBLE(10),
+                pmlarge DOUBLE(10),
+                pmsmall DOUBLE(10)
+                )""")
+
+conn.commit()
+
+def add_data_to_db(conn, cursor, time, values):
+    temp = values["temperature"]
+    humidity = values["humidity"]
+    pressure = values["pressure"]
+    pm10 = values["pm10"]
+    pm25 = values["pm25"]
+
+    command = str(f"INSERT INTO data VALUES ('{time!s}', {temp!s}, {humidity!s}, {pressure!s}, {pm10!s}, {pm25!s})")
+    
+    cursor.execute(command)
+    conn.commit()
+
+    logging.info("Data logged...")
+
 # Main loop =============================================================================
-def mainloop(outfile, infile, local=True):
+def mainloop(local=True):
     time_since_update = 0
     update_time = time.time()
 
@@ -252,7 +283,8 @@ def mainloop(outfile, infile, local=True):
 
                 if local:
                     # Save data to SD card
-                    add_data(measurement_time, values, outfile, infile)
+                    # add_data(measurement_time, values, outfile, infile)
+                    add_data_to_db(conn, cursor, measurement_time, values)
                 else:
                     # Send data to Luftdaten
                     if send_to_luftdaten(values, id):
@@ -260,7 +292,7 @@ def mainloop(outfile, infile, local=True):
                     else:
                         logging.warning("Luftdaten Response: Failed")
             
-            display_status()
+            # display_status()
 
         except Exception as e:
             logging.warning('Main Loop Exception: {}'.format(e))
@@ -268,15 +300,14 @@ def mainloop(outfile, infile, local=True):
 
 while True:
     if not (datetime.datetime.now().minute % 5):
-        outfile, infile = create_file()
+        # outfile, infile = create_file()
 
         try:
             logging.info("Mainloop started")
-            mainloop(outfile, infile, local=True)
+            mainloop(local=True)
 
         except KeyboardInterrupt:
-            outfile.close()
-            infile.close()
+            conn.close()
 
         break
-            
+    
