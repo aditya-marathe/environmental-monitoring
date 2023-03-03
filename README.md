@@ -27,24 +27,24 @@ The project aims to create an environmental monitoring system using a Raspberry 
 > **Note:** Balena Etcher is another popular alternative, but for this you will have to manually install the most up-to-date image of Raspbian from the downloads page (link provided above). This tutorial will only be covering how to use Raspberry PI imager.
 2. After installation, "allow the app to make changes to your device" and you should see the following window on your screen.
 
-<img src="./Screenshots/DetailedSteps/1.png" width="100">
+<img src="./Screenshots/DetailedSteps/1.png" width="300">
 
 3. Click on "Choose OS" and select "Raspberry Pi OS (32-bit)". This installs the latest version of Raspbian (or Debian, a Linux-based OS).
 
-<img src="./Screenshots/DetailedSteps/2.png" width="100">
+<img src="./Screenshots/DetailedSteps/2.png" width="300">
 
 4. Using an micro SD card reader, connect your micro SD card to your computer - you should see a notification from your computer if a storage device was connected. Remember the location (or direcotry) of the micro SD card e.g., "E" or "D" drive.
 5. Next, click "Choose Storage" and select the directory of your micro SD card. 
 
-<img src="./Screenshots/DetailedSteps/3.png" width="100">
+<img src="./Screenshots/DetailedSteps/3.png" width="300">
 
 6. Click the settings icon which has now appeared in the bottom right hand corner. You may set your own hostname, but for this tutorial we will use the hostname "monitor1.local".
 
-<img src="./Screenshots/DetailedSteps/4.png" width="100">
+<img src="./Screenshots/DetailedSteps/4.png" width="300">
 
 > **Note:** The next 2 steps
 7. Check the "Enable SSH" option and select "Use password authentication" which uses the device's password to authenticate an SSH connection. SSH or Secure Shell, is a protocol which allows us to securely connect to our Raspberry Pi via a network connection.
 
-<img src="./Screenshots/DetailedSteps/5.png" width="100">
+<img src="./Screenshots/DetailedSteps/5.png" width="300">
 
 8.  
