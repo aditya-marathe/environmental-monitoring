@@ -362,8 +362,8 @@ def send_to_local_db(data: Dict[str, float], measurement_time: str) -> None:
 
     # Get data
     command += f"{data.get('temperature')!s}," if MEASURE_TEMPERATURE else ""
-    command += f"{data.get('pressure')!s}," if MEASURE_PRESSURE else ""
     command += f"{data.get('humidity')!s}," if MEASURE_HUMIDITY else ""
+    command += f"{data.get('pressure')!s}," if MEASURE_PRESSURE else ""
     command += f"{data.get('cpu_temperature')!s}," if MEASURE_CPU_TEMPERATURE else ""
     command += f"{data.get('P2')!s}," if MEASURE_PM25 else ""
     command += f"{data.get('P1')!s}," if MEASURE_PM10 else ""
@@ -475,12 +475,12 @@ def send_to_luftdaten(data: Dict[str, float], serial_num: str) -> int:
 def verbose(data: Dict[str, float], measurement_time: str) -> None:
     temperature = data.get("temperature")
     temperature = bool(temperature) * (" Tmp: " + str(temperature) + " deg C ")
+    
+    humidity = data.get("humidity")
+    humidity = bool(humidity) * (" Hum: " + str(humidity) + " % ")
 
     pressure = data.get("pressure")
     pressure = bool(pressure) * (" Prs: " + str(pressure) + " hPa ")
-
-    humidity = data.get("humidity")
-    humidity = bool(humidity) * (" Hum: " + str(humidity) + " % ")
 
     cpu_temperature = data.get("cpu_temperature")
     cpu_temperature = bool(cpu_temperature) * (" CPU: " + str(cpu_temperature) + " deg C ")
