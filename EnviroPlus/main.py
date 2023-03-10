@@ -190,6 +190,9 @@ def init() -> Tuple[str, SMBus, BME280, PMS5003, LTR559, ST7735]:
     """
     # Open I2C bus #1
     smbus = SMBus(1)
+    
+    # Waits to avoid Error #121
+    time.sleep(1)
 
     # Temp, Pressure and Humidity sensor
     bme280_instance = BME280(i2c_dev=smbus)
