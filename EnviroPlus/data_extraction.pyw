@@ -194,7 +194,7 @@ class App(tk.Tk):
             )
             return
 
-        selected_table = self.selected_table.get()
+        selected_table = self.selected_table.get().split(" ")[0]
 
         filepath = filedialog.asksaveasfilename(
             title="EnviroPlus: Save table as a CSV file", filetypes=[("CSV file", "*.csv")], defaultextension=".csv",
@@ -211,7 +211,10 @@ class App(tk.Tk):
 
         :return:
         """
-        table_names = list(self.loaded_data.keys())
+        table_names = list()
+
+        for table_name, rows in self.loaded_data.items():
+            table_names.append("{0} [{1} rows]".format(table_name, len(rows) - 1))
 
         # Update dropdown
         self.table_selection.set_menu(table_names[0], *table_names)
@@ -224,7 +227,7 @@ class App(tk.Tk):
 
         :return:
         """
-        selected_table = self.selected_table.get()
+        selected_table = self.selected_table.get().split(" ")[0]
 
         self.treeview.delete(*self.treeview.get_children())
 
