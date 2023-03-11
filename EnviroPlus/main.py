@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 EnviroPlus Python
 -----------------
@@ -12,7 +13,7 @@ Special thanks to Pimoroni for providing the EnviroPlus Python library (MIT Lice
 Pimoroni EnviroPlus Python library: https://github.com/pimoroni/enviroplus-python
 
 Authors: A. Marathe, E. Shindate, M. Jagpal
-Last Updated: 01-03-2023
+Last Updated: 08-03-2023
 """
 
 import logging
@@ -69,7 +70,7 @@ logger.propagate = False
 
 # EDITABLE: Settings ===================================================================================================
 
-MONITOR_NAME = "Monitor 2"
+MONITOR_NAME = "My Monitor"
 
 # Measurements
 ROUND_DATA_TO_DP: int = 2
@@ -190,7 +191,7 @@ def init() -> Tuple[str, SMBus, BME280, PMS5003, LTR559, ST7735]:
     """
     # Open I2C bus #1
     smbus = SMBus(1)
-    
+
     # Waits to avoid Error #121
     time.sleep(1)
 
@@ -318,8 +319,8 @@ def init_local_db() -> None:
         (["Humidity DOUBLE(5)"], MEASURE_HUMIDITY),
         (["Pressure DOUBLE(5)"], MEASURE_PRESSURE),
         (["CPUTemperature Double(5)"], MEASURE_CPU_TEMPERATURE),
-        (["PM10 DOUBLE(5)"], MEASURE_PM10),
         (["PM25 DOUBLE(5)"], MEASURE_PM25),
+        (["PM10 DOUBLE(5)"], MEASURE_PM10),
         ([
              "OxidisingGases Double(10)",
              "ReducingGases Double(10)",
@@ -478,7 +479,7 @@ def send_to_luftdaten(data: Dict[str, float], serial_num: str) -> int:
 def verbose(data: Dict[str, float], measurement_time: str) -> None:
     temperature = data.get("temperature")
     temperature = bool(temperature) * (" Tmp: " + str(temperature) + " deg C ")
-    
+
     humidity = data.get("humidity")
     humidity = bool(humidity) * (" Hum: " + str(humidity) + " % ")
 
@@ -600,6 +601,14 @@ def display_progress_bar(display: ST7735, draw: ImageDraw.Draw, percent: float) 
 # Main =================================================================================================================
 
 def mainloop(bme280_instance: BME280, pms5003_instance: PMS5003, ltr559_instance: LTR559, display: ST7735) -> None:
+    """
+
+    :param bme280_instance:
+    :param pms5003_instance:
+    :param ltr559_instance:
+    :param display:
+    :return:
+    """
     global mainloop_errors, current_scene_id
 
     previous_time = time.time()  # s
@@ -664,6 +673,10 @@ def mainloop(bme280_instance: BME280, pms5003_instance: PMS5003, ltr559_instance
 
 
 def main() -> int:
+    """
+
+    :return:
+    """
     print("==========================")
     print("[   EnviroPlus Monitor   ]")
     print("==========================\n")
