@@ -3,17 +3,18 @@
 """
 EnviroPlus Python
 -----------------
-[Description]
+Python script used for data collection using the Pimoroni's EnviroPlus and the PMS5003 Particulate Matter sensor.
 
 Credits:
-    - Data acquisition (for temperature etc.)        :    E. Shindate, M. Jagpal, J. Keller
-    - Data storage/transfer, LCD and calibration code:    A. Marathe
+    - Data acquisition (for temperature etc.)         : E. Shindate, M. Jagpal, J. Keller
+    - Data storage/transfer, LCD and calibration code : A. Marathe
+    - Documentation                                   : A. Marathe
 
 Special thanks to Pimoroni for providing the EnviroPlus Python library (MIT Licence).
 Pimoroni EnviroPlus Python library: https://github.com/pimoroni/enviroplus-python
 
 Authors: A. Marathe, E. Shindate, M. Jagpal
-Last Updated: 08-03-2023
+Last Updated: 12-03-2023
 """
 
 import logging
@@ -128,45 +129,45 @@ TITLE_FONT = ImageFont.truetype(RobotoMedium, TITLE_FONT_SIZE)
 
 def calibrate_temperature(temperature: float) -> float:
     """
-
-    :param temperature:
-    :return:
+    Code used for temperature calibration.
+    :param temperature: Measured raw or compensated temperature - based on user settings - in deg C.
+    :return: Calibrated temperature.
     """
     return round(temperature, ROUND_DATA_TO_DP)
 
 
 def calibrate_pressure(pressure: float) -> float:
     """
-
-    :param pressure:
-    :return:
+    Code used for pressure calibration.
+    :param pressure: Measured pressure in hPa.
+    :return: Calibrated pressure.
     """
     return round(pressure, ROUND_DATA_TO_DP)
 
 
 def calibrate_humidity(humidity: float) -> float:
     """
-
-    :param humidity:
-    :return:
+    Code used for humidity calibration.
+    :param humidity: Measured humidity.
+    :return: Calibrated humidity.
     """
     return round(humidity, ROUND_DATA_TO_DP)
 
 
 def calibrate_pm25(pm25: int) -> int:
     """
-
-    :param pm25:
-    :return:
+    Code used for PM2.5 calibration.
+    :param pm25: Measured PM2.5 in ug/cm^3.
+    :return: Calibrated PM2.5.
     """
     return round(pm25, ROUND_DATA_TO_DP)
 
 
 def calibrate_pm10(pm10: int) -> int:
     """
-
-    :param pm10:
-    :return:
+    Code used for PM10 calibration.
+    :param pm10: Measured PM10 in ug/cm^3.
+    :return: Calibrated PM10.
     """
     return round(pm10, ROUND_DATA_TO_DP)
 
@@ -174,9 +175,8 @@ def calibrate_pm10(pm10: int) -> int:
 # Functions ============================================================================================================
 
 def get_serial_number() -> str:
-    """Gets RPi serial number.
-
-    :return:
+    """Gets the Raspberry Pi's unique serial number.
+    :return: String containing the serial number of the Raspberry Pi.
     """
     with open("/proc/cpuinfo", "r") as file:
         for line in file:
@@ -186,8 +186,8 @@ def get_serial_number() -> str:
 
 def init() -> Tuple[str, SMBus, BME280, PMS5003, LTR559, ST7735]:
     """
-
-    :return:
+    Initialises the sensors for data collection.
+    :return: Unique serial number of the Raspberry Pi and instances of: SMBus, BME280, PMS5003, LTR559, and ST7735.
     """
     # Open I2C bus #1
     smbus = SMBus(1)
@@ -216,8 +216,8 @@ def init() -> Tuple[str, SMBus, BME280, PMS5003, LTR559, ST7735]:
 
 def get_cpu_temperature() -> float:
     """
-
-    :return:
+    Gets the CPU temperature of the Raspberry Pi in deg C.
+    :return: CPU temperature in deg C.
     """
     with open("/sys/class/thermal/thermal_zone0/temp", "r") as file:
         cpu_temp = int(file.read()) / 1_000.0
@@ -227,11 +227,12 @@ def get_cpu_temperature() -> float:
 
 def compensate_temperature(raw_temp: float, cpu_temp: float, comp_factor: float = TEMP_COMPENSATION_FACTOR) -> float:
     """
-
-    :param raw_temp:
-    :param cpu_temp:
-    :param comp_factor:
-    :return:
+    If the EnviroPlus is directly connected to Raspberry Pi's GPIO, the CPU temperature will increase the BME280's raw
+    temperature readings. This function outputs an estimate of the actual temperature, using a compensation factor.
+    :param raw_temp: The raw temperature reading from the BME280 in deg C.
+    :param cpu_temp: The CPU temperature of the Raspberry Pi in deg C.
+    :param comp_factor: Compensation factor, defaults to a 2.25 (determined by Pimoroni's calibration).
+    :return: Compensated temperature in deg C.
     """
     comp_temp = raw_temp - ((cpu_temp - raw_temp) / comp_factor)
     return round(comp_temp, ROUND_DATA_TO_DP)
@@ -239,10 +240,10 @@ def compensate_temperature(raw_temp: float, cpu_temp: float, comp_factor: float 
 
 def get_sensor_data(bme280_instance: BME280, pms5003_instance: PMS5003) -> Tuple[Dict[str, float], datetime.datetime]:
     """
-
-    :param bme280_instance:
-    :param pms5003_instance:
-    :return:
+    Gets the current sensor readings for BME280 and PMS5003 instances.
+    :param bme280_instance: Instance of the BME280 class.
+    :param pms5003_instance: Instance of the PMS5003 class.
+    :return: A dictionary of the sensor data, and a timestamp of the measurement (datetime.datetime object).
     """
     output = dict()
 
@@ -302,8 +303,10 @@ cursor: Optional[sqlite3.Cursor] = None
 
 def init_local_db() -> None:
     """
+    Initialises a local SQLite database. The database columns are determined by the user's settings and will only
+    include quantities that are currently being measured by the monitor.
 
-    :return:
+    Note: Database information is accessed by the global variables: table_name, connection, and cursor.
     """
     global table_name, connection, cursor
 
@@ -357,10 +360,9 @@ def init_local_db() -> None:
 
 def send_to_local_db(data: Dict[str, float], measurement_time: str) -> None:
     """
-
-    :param data:
-    :param measurement_time:
-    :return:
+    Adds a record of the current measurements to the local SQLite database.
+    :param data: Dictionary of measurements that will be sent to the SQLite database.
+    :param measurement_time: Timestamp of the measurement in "YYYY-MM-DD HH:MM:SS.FFFFFF" format.
     """
     command = "INSERT INTO " + str(table_name) + f" VALUES ('{measurement_time!s}',"
 
@@ -385,10 +387,10 @@ def send_to_local_db(data: Dict[str, float], measurement_time: str) -> None:
 
 def send_to_luftdaten(data: Dict[str, float], serial_num: str) -> int:
     """
-
-    :param data:
-    :param serial_num:
-    :return:
+    Sends data to the Sensor.Community database using Luftdaten API.
+    :param data: Dictionary of measurements that will be sent to the Sensor.Community database.
+    :param serial_num: String containing the serial number of the Raspberry Pi.
+    :return: Exit status for the code.
     """
     if not (MEASURE_PM25 and MEASURE_PM10):
         logger.error("Failed to send data to Luftdaten due to configuration. Possible fix: Enable `MEASURE_PM25` and "
@@ -477,6 +479,11 @@ def send_to_luftdaten(data: Dict[str, float], serial_num: str) -> int:
 # Verbose =============================================================================================================
 
 def verbose(data: Dict[str, float], measurement_time: str) -> None:
+    """
+    Prints the current measurements onto the terminal window.
+    :param data: Dictionary of measurements that will be printed to terminal.
+    :param measurement_time: Timestamp of the measurement in "YYYY-MM-DD HH:MM:SS.FFFFFF" format.
+    """
     temperature = data.get("temperature")
     temperature = bool(temperature) * (" Tmp: " + str(temperature) + " deg C ")
 
@@ -509,6 +516,7 @@ def verbose(data: Dict[str, float], measurement_time: str) -> None:
         + oxidising + reducing + nh3
     )
 
+    # TODO: Printing OpenWeather data
     # if ENABLE_OPEN_WEATHER_API:
     #    print(f"") time --> 26 length
 
@@ -521,9 +529,8 @@ current_scene_id: int = 0
 
 def display_welcome_scene(display: ST7735) -> None:
     """
-
-    :param display:
-    :return:
+    Displays the welcome screen containing the name of the monitor and the Raspberry Pi's current time.
+    :param display: Instance of the ST7735 class.
     """
     image = Image.new(mode="RGB", size=(display.width, display.height), color=(0, 0, 0))
     draw = ImageDraw.Draw(image, mode="RGB")
@@ -544,10 +551,9 @@ def display_welcome_scene(display: ST7735) -> None:
 
 def display_status_bg(display: ST7735, draw: ImageDraw.Draw) -> None:
     """
-
-    :param display:
-    :param draw:
-    :return:
+    Displays the background for the main scene. Background turns red if an error occurs during data collection.
+    :param display: Instance of the ST7735 class.
+    :param draw: The PIL "artist" (instance of ImageDraw.Draw) which will draw to the image "canvas".
     """
     if mainloop_errors:
         draw.rectangle((0, 0, display.width, display.height), COLOURS["red"])
@@ -559,11 +565,11 @@ def display_status_bg(display: ST7735, draw: ImageDraw.Draw) -> None:
 
 def display_main_scene(draw: ImageDraw.Draw, current_time: str, data: Dict[str, float]) -> None:
     """
-
-    :param draw:
-    :param current_time:
-    :param data:
-    :return:
+    Draws the main scene which is a dashboard of the current measurements and shows a progress bar of the time left
+    until the next measurement.
+    :param draw: The PIL "artist" (instance of ImageDraw.Draw) which will draw to the image "canvas".
+    :param current_time: Raspberry Pi's current time in "YYYY-MM-DD HH:MM:SS" format.
+    :param data: Dictionary of measurements that will be printed to terminal.
     """
     draw.text((5, 0), text=f"{MONITOR_NAME}", fill=COLOURS["white"], font=TEXT_FONT)
     draw.text((5, 15), text=f"Last: {current_time!s}", fill=COLOURS["white"], font=TEXT_FONT)
@@ -595,19 +601,27 @@ def display_main_scene(draw: ImageDraw.Draw, current_time: str, data: Dict[str, 
 
 
 def display_progress_bar(display: ST7735, draw: ImageDraw.Draw, percent: float) -> None:
+    """
+    Displays a progress bar to the LCD.
+    :param display: Instance of the ST7735 class.
+    :param draw: The PIL "artist" (instance of ImageDraw.Draw) which will draw to the image "canvas".
+    :param percent: Task percentage completion.
+    """
     draw.rectangle((0, display.height - 8, int(display.width * percent), display.height), COLOURS["lime"])
 
 
 # Main =================================================================================================================
 
-def mainloop(bme280_instance: BME280, pms5003_instance: PMS5003, ltr559_instance: LTR559, display: ST7735) -> None:
+def mainloop(
+        bme280_instance: BME280, pms5003_instance: PMS5003, ltr559_instance: LTR559, display: ST7735, device_id: str
+    ) -> None:
     """
-
-    :param bme280_instance:
-    :param pms5003_instance:
-    :param ltr559_instance:
-    :param display:
-    :return:
+    Data collection mainloop. Sends data to different sources, as specified in the user's settings.
+    :param bme280_instance: Instance of the BME280 class.
+    :param pms5003_instance: Instance of the PMS5003 class.
+    :param ltr559_instance: Instance of the LTR559 class.
+    :param display: Instance of the ST7735 class.
+    :param device_id: String containing the serial number of the Raspberry Pi.
     """
     global mainloop_errors, current_scene_id
 
@@ -620,9 +634,6 @@ def mainloop(bme280_instance: BME280, pms5003_instance: PMS5003, ltr559_instance
 
     if SAVE_DATA_LOCALLY:
         init_local_db()
-
-    # Connect to MongoDB database
-    ...
 
     image = Image.new(mode="RGB", size=(display.width, display.height), color=(0, 0, 0))
     draw = ImageDraw.Draw(image, mode="RGB")
@@ -639,6 +650,10 @@ def mainloop(bme280_instance: BME280, pms5003_instance: PMS5003, ltr559_instance
                 # Data acquisition
                 data, measurement_time = get_sensor_data(bme280_instance, pms5003_instance)
 
+                # TODO: Add OpenWeather API data to the dictionary.
+                if ENABLE_OPEN_WEATHER_API:
+                    raise NotImplementedError("Getting OpenWeather API data has not been implemented yet!")
+
                 # Data storage/transfer
                 if VERBOSE:
                     verbose(data=data, measurement_time=str(measurement_time))
@@ -646,6 +661,16 @@ def mainloop(bme280_instance: BME280, pms5003_instance: PMS5003, ltr559_instance
                 if SAVE_DATA_LOCALLY:
                     send_to_local_db(data=data, measurement_time=str(measurement_time))
                     logging.info("Success: Data saved to local storage.")
+
+                if SEND_TO_LUFTDATEN:
+                    if not send_to_luftdaten(data=data, serial_num=device_id):
+                        logging.info("Success: Data saved to Sensor.Community database.")
+                    else:
+                        raise Exception("Luftdaten API failed to send data to Sensor.Community database.")
+
+                # TODO: Connect to MongoDB database and send data
+                if SEND_TO_MONGODB:
+                    raise NotImplementedError("Sending data to MongoDB has not been implemented yet!")
 
             # User input -> from Light/Proximity sensor
             proximity = ltr559_instance.get_proximity()
@@ -674,8 +699,8 @@ def mainloop(bme280_instance: BME280, pms5003_instance: PMS5003, ltr559_instance
 
 def main() -> int:
     """
-
-    :return:
+    Initialises everything, and starts data collection mainloop.
+    :return: Exit code.
     """
     print("==========================")
     print("[   EnviroPlus Monitor   ]")
@@ -737,7 +762,7 @@ def main() -> int:
 
         # Begin mainloop...
         logging.debug("Starting data acquisition mainloop...")
-        mainloop(*sensor_instances, display=display)
+        mainloop(*sensor_instances, display=display, device_id=device_id)
 
     except KeyboardInterrupt:
         # Close I2C
