@@ -19,18 +19,19 @@ calibration_data['Time'] = calibration_data['Time'].apply(lambda x: round(dateti
 calibration_data_interp = np.interp(measured_data['timestamp'], calibration_data['Time'], calibration_data['Carbon dioxide(ppm)'])
 
 # Calculate the correction factor as the mean ratio of measured to interpolated calibration data
-correction_factor = np.mean(calibration_data_interp / measured_data['co2_ppm'])
-
+correction_factor = np.mean(calibration_data_interp) / np.mean(measured_data['co2_ppm'])
+intercept_factor = np.mean(measured_data['co2_ppm'])-np.mean(calibration_data_interp)
 # Save the correction factor to a file
 np.savetxt('correction_factor.txt', [correction_factor])
 
 # Apply the correction factor to the measured data
-compensated_data = measured_data['co2_ppm'] * correction_factor
+compensated_data = measured_data['co2_ppm'] * correction_factor + intercept_factor
 
 # Save the compensated data to a new file
 compensated_data.to_csv('compensated_data.csv', index=False)
 
-print()
+print(correction_factor)
+print(intercept_factor)
 
 
 
